@@ -8,7 +8,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"], 
+    allow_origins=["http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -26,3 +26,16 @@ def authenticate_user(email: str, password: str):
 
     return JSONResponse(content={"success": False})
 
+
+@app.get("/register_user")
+def register_user(email: str, name: str, password: str):
+    if users_collection.find_one({"email": email}):
+        return JSONResponse(content={"success": False, "message": "User already exists", 'email': email})
+
+    user = {
+        "email": email,
+        "name": name,
+        "password": password
+    }
+    users_collection.insert_one(user)
+    return JSONResponse(content={"success": True, "message": "User registered successfully"})

@@ -1,15 +1,32 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link ,useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 export default function Register() {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
+  const navigator = useNavigate();
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     console.log({ name, email, password });
-    // Add API call logic here
+    try{
+      const res = await axios.get('http://localhost:8000/register_user', {
+        params:{
+          email: email,
+          name: name,
+          password: password,
+        }
+      });
+
+      if(res.data.success) {
+        console.log('Registration successful!');
+        navigator('/');
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (

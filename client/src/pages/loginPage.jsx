@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { use, useState } from 'react';
+import { Link,useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 export default function Login() {
@@ -7,6 +7,8 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  const navigator = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -19,9 +21,11 @@ export default function Login() {
         },
       });
 
-    console.log(res.data);
+      console.log(res.data);
       if (res.data.success) {
+        localStorage.setItem('email', res.data.email);
         setSuccess('Login successful!');
+        navigator('/');
         setError('');
       } else {
         setError('Invalid credentials');
