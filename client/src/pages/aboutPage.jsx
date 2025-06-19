@@ -1,8 +1,20 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 export default function About() {
   return (
     <div className="min-h-screen w-full font-sans bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 text-white animate-fade-in">
+      
+      {/* Navbar */}
+      <header className="bg-white/10 backdrop-blur-md sticky top-0 z-50 px-8 py-4 flex justify-between items-center shadow-md">
+        <h1 className="text-2xl font-bold text-white drop-shadow">SereniAI</h1>
+        <nav className="space-x-6">
+          <Link to="/" className="text-white hover:text-yellow-300 transition font-medium">Home</Link>
+          <Link to="/dashboard" className="text-white hover:text-yellow-300 transition font-medium">Dashboard</Link>
+        </nav>
+      </header>
+
+      {/* Main Content */}
       <section className="px-8 py-20 text-center">
         <h1 className="text-5xl font-extrabold mb-6">Welcome to <span className="bg-white text-pink-600 px-3 py-1 rounded-xl">SereniAI</span></h1>
         <p className="text-xl max-w-4xl mx-auto leading-relaxed">
@@ -25,7 +37,7 @@ export default function About() {
         <h2 className="text-4xl font-bold mb-4">💡 Our Motto</h2>
         <p className="text-xl max-w-3xl mx-auto leading-relaxed">
           “Technology should not only make life easier — it should make life better.”  
-          SereniAI is designed with the belief that **mental wellness is for everyone**, and we aim to bridge the gap between tech and emotional care.
+          SereniAI is designed with the belief that <strong>mental wellness is for everyone</strong>, and we aim to bridge the gap between tech and emotional care.
         </p>
       </section>
 
