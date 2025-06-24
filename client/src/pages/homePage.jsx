@@ -12,12 +12,23 @@ export default function Home() {
         <p className="text-xl max-w-2xl mx-auto mb-8">
           Your companion for emotional well-being. Track your mood, reflect on your thoughts, and grow happier every day — powered by AI.
         </p>
-        <Link
+        <div>
+          <Link
           to={email ? "/dashboard" : "/register"}
           className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full text-lg shadow-lg"
         >
           {email ? "Go to Dashboard" : "Get Started"}
         </Link>
+        </div>
+
+        <div className="mt-8">
+          <Link
+          to="/about"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full text-lg shadow-lg"
+        >
+          About Us
+        </Link>
+        </div>
       </section>
 
       {/* Features Section */}

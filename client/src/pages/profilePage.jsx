@@ -8,6 +8,15 @@ export default function Profile() {
   const [suggestions, setSuggestions] = useState([]);
   const [journalEntries, setJournalEntries] = useState([]);
 
+  const moodLabels = {
+    '5': '😊 Very Happy',
+    '4': '🙂 Happy',
+    '3': '😐 Neutral',
+    '2': '😔 Sad',
+    '1': '😭 Very Sad'
+  };
+
+
   useEffect(() => {
     const fetch_userData = async () => {
       const email = JSON.parse(localStorage.getItem('email'));
@@ -37,15 +46,60 @@ export default function Profile() {
       worstDay: 'Monday'
     });
 
-    setSuggestions([
-      '🌿 Try a 10-min walk at 5 PM to reduce stress.',
-      '🎶 You tend to feel down on Mondays. Try journaling or listening to music.'
-    ]);
+    const fetchMoodJournal = async () =>{
+        const email = JSON.parse(localStorage.getItem('email'));
+        if (!email) {
+          console.error('No user email found in localStorage');
+          return;
+        }
+        try{
+          const res = await axios.get('http://localhost:8000/get_entries',{
+            params: { email: email }
+          });
 
-    setJournalEntries([
-      { date: '2025-06-10', mood: '😊 Happy', note: 'Had a productive day' },
-      { date: '2025-06-09', mood: '😴 Tired', note: 'Slept late' },
-    ]);
+          if(res.data.success){
+            const entries = res.data.entries || [];
+            const formattedEntries = entries.map(entry => ({
+              date: entry.date,
+              mood: moodLabels[entry.mood] || '😐 Neutral',
+              note: entry.note
+            }));
+
+            setJournalEntries(formattedEntries);
+          }
+          
+        }catch (err) {
+          console.error("Error fetching mood journal:", err);
+        }  
+    }
+
+    fetchMoodJournal();
+
+    const fetchSuggestion = async () => {
+      console.log("Fetching Suggestions To the frontend")
+      const email = JSON.parse(localStorage.getItem('email'));
+      if(!email){
+        console.log("No email found");
+      }
+      try{
+        console.log("Awaiting Response")
+        const res = await axios.get('http://localhost:8000/get_suggestions', {
+          params: {email: email}
+        });
+
+        console.log("Got rresponse")
+        console.log(res)
+        if(res.data.success){
+          console.log(res.data.suggestions)
+          setSuggestions(res.data.suggestions)
+        }
+      }catch(err){
+        console.log(err);
+      }
+    }
+
+    fetchSuggestion();
+    
   }, []);
 
   return (
@@ -88,8 +142,14 @@ export default function Profile() {
         {/* AI Suggestions */}
         <section className="bg-white rounded-2xl shadow-lg p-6 animate-fade-in">
           <h2 className="text-2xl font-bold mb-2">🤖 AI Suggestions</h2>
-          <ul className="list-disc ml-6 text-gray-700">
-            {suggestions.map((tip, idx) => <li key={idx}>{tip}</li>)}
+          <ul className="list-disc ml-6 text-gray-700 space-y-2">
+            {suggestions.map((tip, idx) => (
+              <li key={idx}>
+                <span className="font-semibold">{tip.suggestion}</span>
+                <br />
+                <span className="text-sm italic text-gray-600">({tip["what it improves"]})</span>
+              </li>
+            ))}
           </ul>
         </section>
 

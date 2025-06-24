@@ -5,6 +5,8 @@ from mongoDB import entries_collection
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from gemini import get_gemini_response
+import json
 
 app = FastAPI()
 
@@ -74,3 +76,30 @@ def get_entries(email: str):
         return JSONResponse(content={"success": False, "message": "No entries found"})
     entries = [{"mood": entry["mood"], "note": entry["text"], "timestamp": entry["timestamp"]} for entry in entries]
     return JSONResponse(content={"success": True, "entries": entries})
+
+@app.get("/get_suggestions")
+def get_suggestions(email: str):
+    entries = list(entries_collection.find({"email": email}))
+    if not entries:
+        return JSONResponse(content={"success": False, "message": "No mood entries found"})
+
+    simplified_entries = [
+        {"date": e.get("timestamp"), "mood": e.get("mood"), "note": e.get("text", "")}
+        for e in entries
+    ]
+
+    prompt = (
+        f"Based on the following mood entries: {simplified_entries}, "
+        f"return 3 suggestions in pure JSON format as a list of objects, each with 'suggestion' and 'what it improves'. "
+        f"DO NOT include any explanation, just valid JSON."
+    )
+
+    raw_response = get_gemini_response(prompt)
+    print("🟡 Raw Gemini Output:\n", raw_response)  # Debug print
+
+    # Try parsing response as JSON
+    suggestions = json.loads(raw_response.strip())
+    if not isinstance(suggestions, list):
+        raise ValueError("Gemini did not return a JSON array.")
+
+    return JSONResponse(content={"success": True, "suggestions": suggestions})              
